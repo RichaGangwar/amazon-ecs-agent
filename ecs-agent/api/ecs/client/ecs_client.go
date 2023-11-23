@@ -161,7 +161,29 @@ func (client *ecsClient) RegisterContainerInstance(containerInstanceArn string, 
 	tags []*ecsmodel.Tag, registrationToken string, platformDevices []*ecsmodel.PlatformDevice,
 	outpostARN string) (string, string, error) {
 
+	logger.Info("Called ecs client RegisterContainerInstance with values::", logger.Fields{
+		"containerInstanceArn": containerInstanceArn,
+		"registrationToken":    registrationToken,
+		"outpostARN":           outpostARN,
+	})
+	logger.Info("Atrributes in ecs client:")
+	for _, attr := range attributes {
+		logger.Info(attr.String())
+	}
+
+	logger.Info("Tags:")
+	for _, tag := range tags {
+		logger.Info(tag.String())
+	}
+
+	logger.Info("PlatformDevices:")
+	for _, device := range platformDevices {
+		logger.Info(device.String())
+	}
+
 	clusterRef := client.configAccessor.Cluster()
+	logger.Info(fmt.Sprintf("Cluster ref %s", clusterRef))
+
 	// If our clusterRef is empty, we should try to create the default.
 	if clusterRef == "" {
 		clusterRef = client.configAccessor.DefaultClusterName()
@@ -229,6 +251,9 @@ func (client *ecsClient) registerContainerInstance(clusterRef string, containerI
 	registerRequest.TotalResources = resources
 
 	registerRequest.ClientToken = &registrationToken
+
+	logger.Info(fmt.Sprintf("RegisterRequest in ecs client: %v", registerRequest.String()))
+
 	resp, err := client.standardClient.RegisterContainerInstance(&registerRequest)
 	if err != nil {
 		logger.Error("Unable to register as a container instance with ECS", logger.Fields{

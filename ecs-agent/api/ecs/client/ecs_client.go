@@ -454,11 +454,14 @@ func (client *ecsClient) getAdditionalAttributes() []*ecsmodel.Attribute {
 			Name:  aws.String(osTypeAttrName),
 			Value: aws.String(client.configAccessor.OSType()),
 		},
-		{
+	}
+	if client.configAccessor.OSFamily() != "" {
+		attrs = append(attrs, &ecsmodel.Attribute{
 			Name:  aws.String(osFamilyAttrName),
 			Value: aws.String(client.configAccessor.OSFamily()),
-		},
+		})
 	}
+
 	// Send CPU arch attribute directly when running on external capacity. When running on EC2 or Fargate launch type,
 	// this is not needed since the CPU arch is reported via instance identity document in those cases.
 	if client.configAccessor.External() {
